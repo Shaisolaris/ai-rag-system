@@ -1,6 +1,6 @@
-"""FastAPI for the RAG system."""
+"""FastAPI for RAG system."""
 from __future__ import annotations
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from rag.pipeline import RAGPipeline
 
@@ -9,32 +9,35 @@ _pipeline = RAGPipeline()
 
 class IngestRequest(BaseModel):
     text: str = Field(..., min_length=1)
-    source: str = "upload"
-    chunk_size: int = 500
+    source: str = "document"
+    chunk_strategy: str = "tokens"
+    max_tokens: int = 500
 
 class QueryRequest(BaseModel):
-    question: str = Field(..., min_length=1)
+    query: str = Field(..., min_length=1)
     top_k: int = 5
+    system_prompt: str | None = None
 
 @app.get("/health")
-def health():
-    return {"status": "healthy", "documents": _pipeline.document_count}
+def health(): return {"status": "healthy", "documents": _pipeline.store.count}
 
 @app.post("/ingest")
 async def ingest(req: IngestRequest):
-    count = await _pipeline.ingest(req.text, source=req.source, chunk_size=req.chunk_size)
-    return {"chunks_ingested": count, "total_documents": _pipeline.document_count}
+    count = await _pipeline.ingest(req.text, req.source, req.chunk_strategy, req.max_tokens)
+    return {"chunks_ingested": count, "total_documents": _pipeline.store.count}
 
 @app.post("/query")
 async def query(req: QueryRequest):
-    return await _pipeline.query(req.question, top_k=req.top_k)
+    try:
+        result = await _pipeline.generate(req.query, req.top_k, req.system_prompt)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/retrieve")
 async def retrieve(req: QueryRequest):
-    results = await _pipeline.retrieve(req.question, top_k=req.top_k)
-    return {"results": [{"text": doc.text[:300], "score": round(s, 4), "metadata": doc.metadata} for doc, s in results]}
-
-@app.delete("/documents")
-def clear():
-    _pipeline.store.clear()
-    return {"cleared": True}
+    try:
+        results = await _pipeline.retrieve(req.query, req.top_k)
+        return {"results": [{"text": r.document.text[:300], "source": r.document.metadata.get("source"), "score": round(r.score, 4)} for r in results]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

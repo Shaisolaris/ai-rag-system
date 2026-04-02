@@ -3,3 +3,4 @@ fastapi>=0.111.0
 uvicorn>=0.30.0
 pydantic>=2.7.0
 numpy>=1.26.0
+tiktoken>=0.7.0

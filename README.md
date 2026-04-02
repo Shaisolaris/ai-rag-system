@@ -1,47 +1,37 @@
 # ai-rag-system
 
-Retrieval-Augmented Generation system with document chunking (character, paragraph, header-based), OpenAI embeddings, in-memory vector store with cosine similarity search, metadata filtering, and a query pipeline that retrieves context and generates answers via GPT-4o. FastAPI serving layer.
+Retrieval-Augmented Generation system with document chunking (token-based, paragraph-based, header-based), OpenAI embeddings, in-memory vector store with cosine similarity search, and GPT-4o answer generation with source attribution. FastAPI serving layer.
 
 ## Stack
-
 - **AI:** OpenAI (text-embedding-3-small, GPT-4o)
+- **Search:** In-memory vector store with numpy cosine similarity
 - **API:** FastAPI
-- **Vector Store:** In-memory with numpy cosine similarity
 
-## Pipeline
-
-```
-Document → Chunker → Embeddings → Vector Store
-                                       ↑
-Query → Embedding → Similarity Search → Context → GPT-4o → Answer
-```
+## Pipeline: Ingest → Embed → Retrieve → Generate
 
 ## API Endpoints
-
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/ingest` | Ingest text: chunk, embed, store |
-| POST | `/query` | RAG query: retrieve + generate answer |
-| POST | `/retrieve` | Retrieve similar chunks only |
-| DELETE | `/documents` | Clear vector store |
+| POST | `/ingest` | Chunk and embed a document |
+| POST | `/query` | RAG: retrieve + generate answer with sources |
+| POST | `/retrieve` | Retrieve similar chunks without generation |
 | GET | `/health` | Status + document count |
 
-## Chunking Strategies
-
-- **Character-based:** Fixed size with overlap, sentence boundary detection
-- **Paragraph-based:** Split on double newlines, merge small paragraphs
-- **Header-based:** Split markdown by h1-h3 headers with level metadata
+## Architecture
+```
+rag/chunker.py       — 3 chunking strategies (tokens, paragraphs, headers)
+rag/vector_store.py  — In-memory store with cosine similarity search
+rag/pipeline.py      — RAGPipeline: ingest, retrieve, generate
+api/app.py           — FastAPI endpoints
+```
 
 ## Setup
-
 ```bash
 git clone https://github.com/Shaisolaris/ai-rag-system.git
-cd ai-rag-system
-pip install -r requirements.txt
+cd ai-rag-system && pip install -r requirements.txt
 export OPENAI_API_KEY=sk-...
 python main.py
 ```
 
 ## License
-
 MIT
