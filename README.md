@@ -1,5 +1,7 @@
 # ai-rag-system
 
+![CI](https://github.com/Shaisolaris/ai-rag-system/actions/workflows/ci.yml/badge.svg)
+
 Retrieval-Augmented Generation system with document chunking (token-based, paragraph-based, header-based), OpenAI embeddings, in-memory vector store with cosine similarity search, and GPT-4o answer generation with source attribution. FastAPI serving layer.
 
 ## Stack
