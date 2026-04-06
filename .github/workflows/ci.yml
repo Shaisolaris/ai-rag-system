@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Check syntax
+        run: |
+          python -c "
+          import ast, pathlib, sys
+          errors = []
+          for p in pathlib.Path('.').rglob('*.py'):
+              try:
+                  ast.parse(p.read_text())
+              except SyntaxError as e:
+                  errors.append(f'{p}: line {e.lineno}: {e.msg}')
+          if errors:
+              for e in errors: print(e)
+              sys.exit(1)
+          print(f'All Python files pass syntax check')
+          "
