@@ -37,3 +37,34 @@ python main.py
 
 ## License
 MIT
+
+## Architecture
+
+```
+.editorconfig
+.env.example
+.github/workflows/ci.yml
+.gitignore
+Dockerfile
+LICENSE
+README.md
+api/__init__.py
+api/app.py
+main.py
+rag/__init__.py
+rag/chunker.py
+rag/pipeline.py
+rag/vector_store.py
+requirements.txt
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a Pull Request
+
+## License
+
+MIT
