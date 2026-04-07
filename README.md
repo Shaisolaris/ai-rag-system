@@ -68,3 +68,14 @@ requirements.txt
 ## License
 
 MIT
+
+## Why This Over Other RAG Implementations?
+
+| Feature | This System | Typical RAG Tutorials |
+|---|---|---|
+| Runnable demo (no API key needed) | ✅ Mock mode with local knowledge base | ❌ Needs OpenAI key to try |
+| Multiple chunking strategies | ✅ Token, paragraph, header-based | ⚠️ Fixed-size only |
+| Production API | ✅ FastAPI with health checks, error handling | ❌ Jupyter notebook only |
+| Document ingestion pipeline | ✅ PDF, Markdown, plain text | ⚠️ Plain text only |
+| Configurable retrieval | ✅ Top-k, similarity threshold, reranking | ⚠️ Fixed top-k |
+| Conversation memory | ✅ Multi-turn context window | ❌ Single query |
